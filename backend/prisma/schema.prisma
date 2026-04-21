@@ -1,0 +1,71 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id               Int       @id @default(autoincrement())
+  username         String    @unique
+  email            String    @unique
+  password         String
+  role             UserRole  @default(BUYER)
+  home_lat         Float?
+  home_long        Float?
+  posts            Post[]
+  messagesSent     Message[] @relation("SentMessages")
+  messagesReceived Message[] @relation("ReceivedMessages")
+}
+
+enum UserRole {
+  ADMIN
+  SELLER
+  BUYER
+}
+
+model SustainabilityData {
+  id               Int       @id @default(autoincrement())
+  material_name    String    @unique
+  carbon_per_unit  Float
+  water_usage      Float
+  recyclability    String
+  products         Product[]
+}
+
+model Product {
+  id             Int       @id @default(autoincrement())
+  name           String
+  price          Float
+  warehouse_lat  Float
+  warehouse_long Float
+  material_id    Int
+  creator_id     Int
+  
+  material       SustainabilityData @relation(fields: [material_id], references: [id])
+  posts          Post[]
+}
+
+model Post {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  product_id Int
+  content    String
+  timestamp  DateTime @default(now())
+
+  user       User     @relation(fields: [user_id], references: [id])
+  product    Product  @relation(fields: [product_id], references: [id])
+}
+
+model Message {
+  id          Int      @id @default(autoincrement())
+  sender_id   Int
+  receiver_id Int
+  text        String
+  timestamp   DateTime @default(now())
+
+  sender   User @relation("SentMessages", fields: [sender_id], references: [id])
+  receiver User @relation("ReceivedMessages", fields: [receiver_id], references: [id])
+}
