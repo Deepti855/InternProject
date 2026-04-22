@@ -18,6 +18,10 @@ import Poll from "./Poll";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+const API_BASE_URL = (
+  import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+).replace(/\/api\/?$/, "");
+
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
   if (!lat1 || !lon1 || !lat2 || !lon2) return "Unknown";
   const R = 6371; // km
@@ -391,7 +395,7 @@ export default function PostCard({ post, currentUserId, onDelete }) {
             {post.image_url && (
               <div className="mt-4 overflow-hidden rounded-xl bg-gray-50">
                 <img
-                  src={`http://localhost:5000${post.image_url}`}
+                  src={`${API_BASE_URL}${post.image_url}`}
                   alt="Post attachment"
                   className="w-full object-cover h-auto rounded-xl hover:scale-[1.01] transition-transform duration-700"
                 />
